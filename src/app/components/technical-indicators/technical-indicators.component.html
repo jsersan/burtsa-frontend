@@ -1,0 +1,371 @@
+<div class="indicators-container">
+      
+    <!-- Consenso General -->
+    <div class="consensus-card" *ngIf="consensus" [ngClass]="consensus.type">
+      <div class="consensus-header">
+        <div class="consensus-icon">{{ getConsensusIcon(consensus.type) }}</div>
+        <div class="consensus-info">
+          <h3>{{ getConsensusTitle(consensus.type) }}</h3>
+          <p>{{ consensus.message }}</p>
+        </div>
+        <div class="consensus-strength">
+          <div class="strength-circle" [style.background]="getStrengthColor(consensus.strength)">
+            <span>{{ consensus.strength }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Señales Activas -->
+    <div class="signals-section" *ngIf="signals.length > 0">
+      <h3 class="section-title">🚦 Señales Activas ({{ signals.length }})</h3>
+      
+      <div class="signals-grid">
+        <div 
+          class="signal-card" 
+          *ngFor="let signal of signals"
+          [ngClass]="signal.type">
+          
+          <div class="signal-header">
+            <span class="signal-indicator">{{ signal.indicator }}</span>
+            <span class="signal-badge">{{ getSignalBadge(signal.type) }}</span>
+          </div>
+          
+          <p class="signal-message">{{ signal.message }}</p>
+          
+          <div class="signal-footer">
+            <div class="strength-bar">
+              <div 
+                class="strength-fill" 
+                [style.width.%]="signal.strength"
+                [ngClass]="signal.type"></div>
+            </div>
+            <span class="strength-label">{{ signal.strength }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Indicadores Detallados -->
+    <div class="indicators-section" *ngIf="indicators">
+      <h3 class="section-title">📊 Indicadores Técnicos</h3>
+
+      <!-- Medias Móviles -->
+      <div class="indicator-group">
+        <h4 class="group-title">Medias Móviles</h4>
+        <div class="indicators-row">
+          
+          <div class="indicator-item" *ngIf="indicators.sma20">
+            <span class="indicator-label">SMA 20</span>
+            <span class="indicator-value">{{ formatNumber(indicators.sma20) }}</span>
+            <span class="indicator-status" [ngClass]="getPriceVsSMA(currentPrice, indicators.sma20)">
+              {{ getPriceVsSMAText(currentPrice, indicators.sma20) }}
+            </span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.sma50">
+            <span class="indicator-label">SMA 50</span>
+            <span class="indicator-value">{{ formatNumber(indicators.sma50) }}</span>
+            <span class="indicator-status" [ngClass]="getPriceVsSMA(currentPrice, indicators.sma50)">
+              {{ getPriceVsSMAText(currentPrice, indicators.sma50) }}
+            </span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.ema10">
+            <span class="indicator-label">EMA 10</span>
+            <span class="indicator-value">{{ formatNumber(indicators.ema10) }}</span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.ema50">
+            <span class="indicator-label">EMA 50</span>
+            <span class="indicator-value">{{ formatNumber(indicators.ema50) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MACD -->
+      <div class="indicator-group" *ngIf="indicators.macd">
+        <h4 class="group-title">MACD</h4>
+        <div class="indicators-row">
+          <div class="indicator-item">
+            <span class="indicator-label">MACD</span>
+            <span class="indicator-value" [ngClass]="getValueClass(indicators.macd.value)">
+              {{ formatNumber(indicators.macd.value) }}
+            </span>
+          </div>
+          <div class="indicator-item">
+            <span class="indicator-label">Señal</span>
+            <span class="indicator-value">{{ formatNumber(indicators.macd.signal) }}</span>
+          </div>
+          <div class="indicator-item">
+            <span class="indicator-label">Histograma</span>
+            <span class="indicator-value" [ngClass]="getValueClass(indicators.macd.histogram)">
+              {{ formatNumber(indicators.macd.histogram) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ichimoku -->
+      <div class="indicator-group" *ngIf="indicators.ichimoku">
+        <h4 class="group-title">Nube Ichimoku</h4>
+        <div class="indicators-row">
+          <div class="indicator-item">
+            <span class="indicator-label">Tenkan-sen</span>
+            <span class="indicator-value">{{ formatNumber(indicators.ichimoku.tenkan) }}</span>
+          </div>
+          <div class="indicator-item">
+            <span class="indicator-label">Kijun-sen</span>
+            <span class="indicator-value">{{ formatNumber(indicators.ichimoku.kijun) }}</span>
+          </div>
+          <div class="indicator-item">
+            <span class="indicator-label">Nube</span>
+            <span class="indicator-value cloud" [ngClass]="indicators.ichimoku.cloudColor">
+              {{ indicators.ichimoku.cloudColor === 'green' ? '🟢 Alcista' : '🔴 Bajista' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADX -->
+      <div class="indicator-group" *ngIf="indicators.adx">
+        <h4 class="group-title">ADX (Fuerza de Tendencia)</h4>
+        <div class="indicators-row">
+          <div class="indicator-item">
+            <span class="indicator-label">ADX</span>
+            <span class="indicator-value" [ngClass]="getADXClass(indicators.adx.value)">
+              {{ formatNumber(indicators.adx.value) }}
+            </span>
+            <span class="indicator-status">{{ getADXText(indicators.adx.value) }}</span>
+          </div>
+          <div class="indicator-item">
+            <span class="indicator-label">+DI</span>
+            <span class="indicator-value positive">{{ formatNumber(indicators.adx.plusDI) }}</span>
+          </div>
+          <div class="indicator-item">
+            <span class="indicator-label">-DI</span>
+            <span class="indicator-value negative">{{ formatNumber(indicators.adx.minusDI) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Osciladores -->
+      <div class="indicator-group">
+        <h4 class="group-title">Osciladores</h4>
+        <div class="indicators-row">
+          
+          <div class="indicator-item" *ngIf="indicators.rsi !== null">
+            <span class="indicator-label">RSI (14)</span>
+            <span class="indicator-value" [ngClass]="getRSIClass(indicators.rsi)">
+              {{ formatNumber(indicators.rsi) }}
+            </span>
+            <span class="indicator-status">{{ getRSIText(indicators.rsi) }}</span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.stochastic">
+            <span class="indicator-label">Estocástico %K</span>
+            <span class="indicator-value" [ngClass]="getStochasticClass(indicators.stochastic.k)">
+              {{ formatNumber(indicators.stochastic.k) }}
+            </span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.cci !== null">
+            <span class="indicator-label">CCI</span>
+            <span class="indicator-value" [ngClass]="getCCIClass(indicators.cci)">
+              {{ formatNumber(indicators.cci) }}
+            </span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.williamsR !== null">
+            <span class="indicator-label">Williams %R</span>
+            <span class="indicator-value" [ngClass]="getWilliamsClass(indicators.williamsR)">
+              {{ formatNumber(indicators.williamsR) }}
+            </span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.momentum !== null">
+            <span class="indicator-label">Momentum</span>
+            <span class="indicator-value" [ngClass]="getValueClass(indicators.momentum)">
+              {{ formatNumber(indicators.momentum) }}
+            </span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.aroon">
+            <span class="indicator-label">Aroon Up/Down</span>
+            <span class="indicator-value">
+              <span class="positive">{{ formatNumber(indicators.aroon.up) }}</span> / 
+              <span class="negative">{{ formatNumber(indicators.aroon.down) }}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================ -->
+<!-- AÑADIR ESTAS SECCIONES DESPUÉS DE LA SECCIÓN "Osciladores" -->
+<!-- Y ANTES DE LA SECCIÓN "Sin datos" -->
+<!-- ============================================ -->
+
+      <!-- NUEVOS: Volatilidad y Volumen -->
+      <div class="indicator-group">
+        <h4 class="group-title">Volatilidad y Volumen</h4>
+        <div class="indicators-row">
+          
+          <!-- Bandas de Bollinger -->
+          <div class="indicator-item" *ngIf="indicators.bollingerBands">
+            <span class="indicator-label">Bollinger Superior</span>
+            <span class="indicator-value">{{ formatNumber(indicators.bollingerBands.upper) }}</span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.bollingerBands">
+            <span class="indicator-label">Bollinger Medio</span>
+            <span class="indicator-value">{{ formatNumber(indicators.bollingerBands.middle) }}</span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.bollingerBands">
+            <span class="indicator-label">Bollinger Inferior</span>
+            <span class="indicator-value" [ngClass]="getBollingerClass(currentPrice, indicators.bollingerBands)">
+              {{ formatNumber(indicators.bollingerBands.lower) }}
+            </span>
+            <span class="indicator-status" *ngIf="currentPrice <= indicators.bollingerBands.lower">
+              ⚠️ Precio en banda baja
+            </span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.bollingerBands">
+            <span class="indicator-label">Ancho de Banda</span>
+            <span class="indicator-value">{{ formatNumber(indicators.bollingerBands.bandwidth) }}%</span>
+            <span class="indicator-status" *ngIf="indicators.bollingerBands.bandwidth < 10">
+              🔥 Squeeze - Gran movimiento próximo
+            </span>
+          </div>
+
+          <!-- ATR -->
+          <div class="indicator-item" *ngIf="indicators.atr !== null">
+            <span class="indicator-label">ATR (14)</span>
+            <span class="indicator-value">{{ formatNumber(indicators.atr) }}</span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.atr !== null">
+            <span class="indicator-label">Stop Loss Sugerido</span>
+            <span class="indicator-value strong">{{ formatNumber(indicators.atr * 2) }}€</span>
+            <span class="indicator-status">2x ATR</span>
+          </div>
+
+          <!-- OBV -->
+          <div class="indicator-item" *ngIf="indicators.obv !== null">
+            <span class="indicator-label">OBV</span>
+            <span class="indicator-value" [ngClass]="getValueClass(indicators.obv)">
+              {{ formatOBV(indicators.obv) }}
+            </span>
+          </div>
+
+          <!-- Análisis de Volumen -->
+          <div class="indicator-item" *ngIf="indicators.volumeAnalysis">
+            <span class="indicator-label">Volumen Actual</span>
+            <span class="indicator-value">{{ formatVolume(indicators.volumeAnalysis.current) }}</span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.volumeAnalysis">
+            <span class="indicator-label">Volumen Promedio</span>
+            <span class="indicator-value">{{ formatVolume(indicators.volumeAnalysis.average) }}</span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.volumeAnalysis">
+            <span class="indicator-label">Estado Volumen</span>
+            <span class="indicator-value" [ngClass]="getVolumeTrendClass(indicators.volumeAnalysis.trend)">
+              {{ getVolumeTrendText(indicators.volumeAnalysis.trend) }}
+            </span>
+            <span class="indicator-status" *ngIf="indicators.volumeAnalysis.spike">
+              🔥 Pico de volumen!
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- NUEVOS: Soporte y Resistencia -->
+      <div class="indicator-group">
+        <h4 class="group-title">Soporte y Resistencia</h4>
+        <div class="indicators-row">
+          
+          <!-- Fibonacci -->
+          <div class="indicator-item" *ngIf="indicators.fibonacci">
+            <span class="indicator-label">Fib 23.6%</span>
+            <span class="indicator-value" [ngClass]="getFibonacciClass(currentPrice, indicators.fibonacci.level236)">
+              {{ formatNumber(indicators.fibonacci.level236) }}
+            </span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.fibonacci">
+            <span class="indicator-label">Fib 38.2%</span>
+            <span class="indicator-value" [ngClass]="getFibonacciClass(currentPrice, indicators.fibonacci.level382)">
+              {{ formatNumber(indicators.fibonacci.level382) }}
+            </span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.fibonacci">
+            <span class="indicator-label">Fib 50%</span>
+            <span class="indicator-value" [ngClass]="getFibonacciClass(currentPrice, indicators.fibonacci.level50)">
+              {{ formatNumber(indicators.fibonacci.level50) }}
+            </span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.fibonacci">
+            <span class="indicator-label">Fib 61.8% ⭐</span>
+            <span class="indicator-value strong" [ngClass]="getFibonacciClass(currentPrice, indicators.fibonacci.level618)">
+              {{ formatNumber(indicators.fibonacci.level618) }}
+            </span>
+            <span class="indicator-status" *ngIf="isNearFibonacci(currentPrice, indicators.fibonacci.level618)">
+              🎯 Nivel clave
+            </span>
+          </div>
+
+          <!-- Puntos Pivote -->
+          <div class="indicator-item" *ngIf="indicators.pivotPoints">
+            <span class="indicator-label">Pivot</span>
+            <span class="indicator-value strong">{{ formatNumber(indicators.pivotPoints.pivot) }}</span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.pivotPoints">
+            <span class="indicator-label">R1 (Resistencia 1)</span>
+            <span class="indicator-value negative">{{ formatNumber(indicators.pivotPoints.r1) }}</span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.pivotPoints">
+            <span class="indicator-label">R2 (Resistencia 2)</span>
+            <span class="indicator-value negative">{{ formatNumber(indicators.pivotPoints.r2) }}</span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.pivotPoints">
+            <span class="indicator-label">S1 (Soporte 1)</span>
+            <span class="indicator-value positive">{{ formatNumber(indicators.pivotPoints.s1) }}</span>
+          </div>
+
+          <div class="indicator-item" *ngIf="indicators.pivotPoints">
+            <span class="indicator-label">S2 (Soporte 2)</span>
+            <span class="indicator-value positive">{{ formatNumber(indicators.pivotPoints.s2) }}</span>
+          </div>
+
+        </div>
+      </div>
+
+<!-- ============================================ -->
+<!-- FIN DE LAS NUEVAS SECCIONES -->
+<!-- ============================================ -->
+
+    <!-- Sin datos -->
+    <div class="no-data" *ngIf="!indicators && !loading">
+      <div class="no-data-icon">📊</div>
+      <p>No hay datos históricos suficientes para calcular indicadores</p>
+      <small>Se necesitan al menos 50 días de datos</small>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Calculando indicadores...</p>
+    </div>
+
+  </div>

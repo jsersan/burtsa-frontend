@@ -75,6 +75,87 @@
       </div>
     </div>
 
+    <!-- ============================================ -->
+    <!-- NUEVA SECCIÓN: EURIBOR & CALCULADORA -->
+    <!-- ============================================ -->
+    <div class="euribor-portfolio-section">
+      <!-- Euribor Card -->
+      <div class="euribor-mini-card">
+        <div class="euribor-header">
+          <div class="euribor-icon">📊</div>
+          <div class="euribor-info">
+            <h3>Euribor a 1 año</h3>
+            <span class="euribor-date">{{ formatEuriborDate(euriborDate) }}</span>
+          </div>
+        </div>
+
+        <div class="euribor-value">
+          <span class="rate-number">{{ formatNumber(euriborRate, 3) }}%</span>
+          <div class="rate-change" [ngClass]="getChangeClass(euriborChange)">
+            <span class="change-icon">{{ getChangeIcon(euriborChange) }}</span>
+            <span class="change-value">{{ formatNumber(Math.abs(euriborChange), 3) }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calculadora Hipoteca -->
+      <div class="hipoteca-calculator-card">
+        <h3 class="calculator-title">🏠 Mi Hipoteca</h3>
+
+        <div class="calculator-compact">
+          <!-- Inputs compactos -->
+          <div class="input-row">
+            <div class="input-group">
+              <label>Capital (€)</label>
+              <input 
+                type="number" 
+                [(ngModel)]="capitalPendiente"
+                (ngModelChange)="calcularCuota()"
+                placeholder="150000"
+                class="compact-input">
+            </div>
+
+            <div class="input-group">
+              <label>Fecha fin</label>
+              <input 
+                type="date" 
+                [(ngModel)]="fechaFinalizacion"
+                (ngModelChange)="calcularCuota()"
+                class="compact-input">
+            </div>
+
+            <div class="input-group">
+              <label>Diferencial (%)</label>
+              <input 
+                type="number" 
+                [(ngModel)]="diferencial"
+                (ngModelChange)="onDiferencialChange()"
+                step="0.01"
+                class="compact-input">
+            </div>
+          </div>
+
+          <!-- Resultado -->
+          <div class="cuota-result" *ngIf="cuotaMensual > 0">
+            <div class="cuota-label">Cuota mensual:</div>
+            <div class="cuota-value">{{ formatNumber(cuotaMensual, 2) }}€</div>
+          </div>
+
+          <!-- Info adicional compacta -->
+          <div class="info-compact" *ngIf="cuotaMensual > 0">
+            <span>Plazo: {{ plazoMeses }} meses</span>
+            <span>•</span>
+            <span>Tipo: {{ formatNumber(tipoInteres, 2) }}%</span>
+            <span>•</span>
+            <span>Intereses: {{ formatNumber(interesesTotales, 2) }}€</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ============================================ -->
+    <!-- FIN SECCIÓN EURIBOR -->
+    <!-- ============================================ -->
+
     <!-- Empty State -->
     <div class="empty-state" *ngIf="getStocksArray().length === 0">
       <div class="empty-icon">📊</div>

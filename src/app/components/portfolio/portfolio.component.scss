@@ -74,13 +74,12 @@
   }
 }
 
-// Contenedor del banner fuera del header
+// Update time banner
 .update-time-container {
   background-color: #f8f9fa;
   padding: 0 20px;
 }
 
-// Banner - color verde del contenedor
 .update-time-banner {
   max-width: 1400px;
   margin: 0 auto;
@@ -231,6 +230,177 @@
     }
   }
 }
+
+// ============================================
+// SECCIÓN EURIBOR EN PORTFOLIO
+// ============================================
+
+.euribor-portfolio-section {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+
+// Euribor mini card
+.euribor-mini-card {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border-radius: 12px;
+  padding: 24px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+
+  .euribor-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+
+    .euribor-icon {
+      font-size: 32px;
+      line-height: 1;
+    }
+
+    .euribor-info {
+      flex: 1;
+
+      h3 {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0 0 4px 0;
+      }
+
+      .euribor-date {
+        font-size: 12px;
+        opacity: 0.9;
+      }
+    }
+  }
+
+  .euribor-value {
+    text-align: center;
+
+    .rate-number {
+      display: block;
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .rate-change {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+
+      &.positive .change-icon {
+        color: #fca5a5;
+      }
+
+      &.negative .change-icon {
+        color: #86efac;
+      }
+    }
+  }
+}
+
+// Calculadora hipoteca compacta
+.hipoteca-calculator-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  .calculator-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 16px 0;
+  }
+
+  .calculator-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .input-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+      }
+
+      .compact-input {
+        padding: 8px 12px;
+        border: 2px solid #e5e7eb;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: border-color 0.2s ease;
+
+        &:focus {
+          outline: none;
+          border-color: #4f46e5;
+        }
+      }
+    }
+
+    .cuota-result {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      padding: 16px;
+      border-radius: 8px;
+      border: 2px solid #86efac;
+
+      .cuota-label {
+        font-size: 14px;
+        color: #065f46;
+        font-weight: 600;
+      }
+
+      .cuota-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #065f46;
+      }
+    }
+
+    .info-compact {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #6b7280;
+      padding: 8px;
+      background-color: #f9fafb;
+      border-radius: 6px;
+
+      span {
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+// ============================================
+// FIN SECCIÓN EURIBOR
+// ============================================
 
 // Empty State
 .empty-state {
@@ -541,6 +711,17 @@
 
   .summary-section {
     grid-template-columns: 1fr;
+  }
+
+  // Euribor responsive
+  .euribor-portfolio-section {
+    grid-template-columns: 1fr;
+  }
+
+  .hipoteca-calculator-card {
+    .calculator-compact .input-row {
+      grid-template-columns: 1fr;
+    }
   }
 
   .stocks-grid {

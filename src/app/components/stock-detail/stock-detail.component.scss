@@ -632,3 +632,75 @@
     font-size: 20px;
   }
 }
+
+// ============================================
+// AÑADIR ESTO AL FINAL DE stock-detail.component.scss
+// ============================================
+
+// Sección de Análisis Técnico
+.technical-analysis-section {
+  margin-top: 30px;
+  
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #1f2937;
+  }
+
+  .loading-indicators {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #2c7a7b;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    p {
+      color: #6b7280;
+      font-size: 14px;
+    }
+  }
+
+  .no-indicators {
+    text-align: center;
+    padding: 60px 40px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    .no-data-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #6b7280;
+      margin: 0 0 8px 0;
+    }
+
+    small {
+      font-size: 13px;
+      color: #9ca3af;
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// ============================================
+// FIN DE LOS NUEVOS ESTILOS
+// ============================================

@@ -212,6 +212,10 @@ export class MarketViewComponent implements OnInit, OnDestroy {
     this.router.navigate(['/portfolio']);
   }
 
+  navigateToEuribor() {
+    this.router.navigate(['/euribor']);
+  }
+
   /**
    * Formatear número con separador de miles
    */

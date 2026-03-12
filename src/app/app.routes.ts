@@ -5,6 +5,7 @@ import { AuthComponent } from './components/auth/auth.component';
 import { PortfolioComponent } from './components/portfolio/portfolio.component';
 import { authGuard } from './guards/auth.guard';
 import { CashManagementComponent } from './components/cash-managment/cash-managment.component';
+import { EuriborComponent } from './components/euribor/euribor.component';
 
 export const routes: Routes = [
   {
@@ -16,6 +17,10 @@ export const routes: Routes = [
     path: 'cash-management',
     component: CashManagementComponent,
     canActivate: [authGuard]  // ← Ruta protegida
+  },
+  {
+    path: 'euribor',
+    component: EuriborComponent
   },
   {
     path: 'login',

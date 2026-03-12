@@ -188,6 +188,41 @@
         </p>
       </div>
     </div>
+    
+<!-- ============================================ -->
+<!-- AÑADIR ESTO DESPUÉS DE LA SECCIÓN "trading-section" -->
+<!-- Y ANTES DE LA SECCIÓN "company-section" -->
+<!-- ============================================ -->
+
+    <!-- NUEVA SECCIÓN: Análisis Técnico -->
+    <div class="technical-analysis-section" *ngIf="stock">
+      <h2 class="section-title">📊 Análisis Técnico</h2>
+      
+      <!-- Loading indicators -->
+      <div class="loading-indicators" *ngIf="loadingIndicators">
+        <div class="spinner"></div>
+        <p>Calculando indicadores técnicos...</p>
+      </div>
+      
+      <!-- Componente de indicadores -->
+      <app-technical-indicators 
+        *ngIf="!loadingIndicators && priceHistory.length > 0"
+        [priceHistory]="priceHistory"
+        [currentPrice]="stock.price">
+      </app-technical-indicators>
+      
+      <!-- Sin datos -->
+      <div class="no-indicators" *ngIf="!loadingIndicators && priceHistory.length === 0">
+        <div class="no-data-icon">📊</div>
+        <p>No hay datos históricos disponibles para calcular indicadores</p>
+        <small>Se necesitan al menos 50 días de datos</small>
+      </div>
+    </div>
+
+<!-- ============================================ -->
+<!-- FIN DE LA NUEVA SECCIÓN -->
+<!-- ============================================ -->
+
 
     <!-- Company Profile -->
     <div class="company-section">

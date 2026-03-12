@@ -1,16 +1,18 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { PortfolioService, Portfolio, Transaction } from '../../services/portfolio.service';
 import { MarketDataService } from '../../services/market-data.service';
+import { EuriborService } from '../../services/euribor.service';
 import { Subject, takeUntil } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-portfolio',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './portfolio.component.html',
   styleUrls: ['./portfolio.component.scss']
 })
@@ -21,6 +23,21 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   userName = '';
   lastUpdateTime: string = '';
   
+  // Variables Euribor
+  euriborRate: number = 0;
+  euriborDate: string = '';
+  euriborChange: number = 0;
+  
+  // Variables calculadora hipoteca
+  capitalPendiente: number | null = null;
+  fechaFinalizacion: string = '';
+  diferencial: number = 0.50;
+  tipoInteres: number = 0;
+  cuotaMensual: number = 0;
+  plazoMeses: number = 0;
+  interesesTotales: number = 0;
+  totalAPagar: number = 0;
+  
   private destroy$ = new Subject<void>();
   Math = Math;
 
@@ -28,6 +45,7 @@ export class PortfolioComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private portfolioService: PortfolioService,
     private marketDataService: MarketDataService,
+    private euriborService: EuriborService,
     private router: Router
   ) {}
 
@@ -40,10 +58,18 @@ export class PortfolioComponent implements OnInit, OnDestroy {
     }
 
     this.userName = user.displayName || user.email || 'Usuario';
-    await this.loadPortfolioData(user.uid);
+    
+    // Cargar datos del portfolio Y del Euribor
+    await Promise.all([
+      this.loadPortfolioData(user.uid),
+      this.loadEuriborData()
+    ]);
     
     // Actualizar precios cada 30 segundos
     setInterval(() => this.updatePrices(user.uid), 30000);
+    
+    // Actualizar Euribor cada 5 minutos
+    setInterval(() => this.loadEuriborData(), 300000);
   }
 
   ngOnDestroy() {
@@ -74,7 +100,6 @@ export class PortfolioComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error('Error al cargar datos:', error);
       
-      // Toast de error
       Swal.fire({
         icon: 'error',
         title: 'Error al cargar datos',
@@ -87,6 +112,31 @@ export class PortfolioComponent implements OnInit, OnDestroy {
       });
     } finally {
       this.loading = false;
+    }
+  }
+
+  /**
+   * Cargar datos del Euribor
+   */
+  async loadEuriborData() {
+    try {
+      const data = await this.euriborService.getCurrentEuribor();
+      
+      this.euriborRate = data.rate;
+      this.euriborDate = data.date;
+      this.euriborChange = data.change;
+      
+      // Actualizar tipo de interés en la calculadora
+      this.tipoInteres = this.euriborRate + this.diferencial;
+      
+      // Recalcular si hay datos
+      if (this.capitalPendiente && this.fechaFinalizacion) {
+        this.calcularCuota();
+      }
+      
+      console.log('✅ Euribor cargado:', this.euriborRate + '%');
+    } catch (error) {
+      console.error('Error al cargar Euribor:', error);
     }
   }
 
@@ -135,6 +185,91 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * ============================================
+   * MÉTODOS DE LA CALCULADORA DE HIPOTECA
+   * ============================================
+   */
+
+  /**
+   * Calcular plazo en meses (diferencia exacta de meses)
+   */
+  calcularPlazo(): number {
+    if (!this.fechaFinalizacion) return 0;
+
+    const hoy = new Date();
+    const fechaFin = new Date(this.fechaFinalizacion);
+    
+    // Calcular diferencia exacta de meses
+    let meses = (fechaFin.getFullYear() - hoy.getFullYear()) * 12 
+              + (fechaFin.getMonth() - hoy.getMonth());
+    
+    // Ajustar si el día de finalización es anterior al día actual
+    if (fechaFin.getDate() < hoy.getDate()) {
+      meses--;
+    }
+    
+    return meses > 0 ? meses : 0;
+  }
+
+  /**
+   * Calcular cuota mensual con sistema francés
+   */
+  calcularCuota() {
+    if (!this.capitalPendiente || !this.fechaFinalizacion || this.capitalPendiente <= 0) {
+      this.resetCalculation();
+      return;
+    }
+
+    this.plazoMeses = this.calcularPlazo();
+    
+    if (this.plazoMeses <= 0) {
+      this.resetCalculation();
+      return;
+    }
+
+    // Actualizar tipo de interés total
+    this.tipoInteres = this.euriborRate + this.diferencial;
+    
+    // Interés mensual
+    const interesMensual = this.tipoInteres / 100 / 12;
+    
+    // Sistema Francés: C = P * [i(1+i)^n] / [(1+i)^n - 1]
+    const factor = Math.pow(1 + interesMensual, this.plazoMeses);
+    this.cuotaMensual = this.capitalPendiente * (interesMensual * factor) / (factor - 1);
+    
+    // Calcular totales
+    this.totalAPagar = this.cuotaMensual * this.plazoMeses;
+    this.interesesTotales = this.totalAPagar - this.capitalPendiente;
+  }
+
+  /**
+   * Resetear cálculos
+   */
+  private resetCalculation() {
+    this.cuotaMensual = 0;
+    this.plazoMeses = 0;
+    this.interesesTotales = 0;
+    this.totalAPagar = 0;
+  }
+
+  /**
+   * Actualizar diferencial y recalcular
+   */
+  onDiferencialChange() {
+    if (this.diferencial < 0) {
+      this.diferencial = 0;
+    }
+    this.tipoInteres = this.euriborRate + this.diferencial;
+    this.calcularCuota();
+  }
+
+  /**
+   * ============================================
+   * MÉTODOS DE NAVEGACIÓN
+   * ============================================
+   */
+
+  /**
    * Navegar a gestión de efectivo
    */
   manageCash() {
@@ -178,7 +313,6 @@ export class PortfolioComponent implements OnInit, OnDestroy {
       try {
         await this.authService.logout();
         
-        // Toast de éxito
         Swal.fire({
           icon: 'success',
           title: '¡Hasta pronto!',
@@ -209,6 +343,12 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * ============================================
+   * MÉTODOS DE UTILIDAD
+   * ============================================
+   */
+
+  /**
    * Obtener array de acciones
    */
   getStocksArray() {
@@ -220,6 +360,8 @@ export class PortfolioComponent implements OnInit, OnDestroy {
    * Formatear número con separador de miles
    */
   formatNumber(num: number, decimals: number = 2): string {
+    if (!num && num !== 0) return '0,00';
+    
     const fixed = num.toFixed(decimals);
     const [integer, decimal] = fixed.split('.');
     const withThousands = integer.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -243,10 +385,31 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Formatear fecha del Euribor
+   */
+  formatEuriborDate(dateString: string): string {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+  }
+
+  /**
    * Clase CSS según ganancia/pérdida
    */
   getChangeClass(value: number): string {
     return value >= 0 ? 'positive' : 'negative';
+  }
+
+  /**
+   * Icono según cambio
+   */
+  getChangeIcon(change: number): string {
+    return change >= 0 ? '▲' : '▼';
   }
 
   /**

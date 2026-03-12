@@ -3,7 +3,7 @@ export const environment = {
   
   yahooFinance: {
     enabled: true,
-    backendUrl: 'https://backend-yahoo.onrender.com/api'
+    backendUrl: 'http://localhost:3000/api'
   },
   
   // Finnhub (deshabilitado en producción)

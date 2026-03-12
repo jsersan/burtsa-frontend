@@ -1,0 +1,201 @@
+<div class="euribor-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <button class="back-button" (click)="goToMarket()">
+        ← Volver
+      </button>
+      <h1 class="logo">Euribor & Calculadora Hipoteca</h1>
+      <button class="portfolio-button" (click)="goToPortfolio()">
+        💼 Mi Cartera
+      </button>
+    </div>
+  </header>
+
+  <!-- Banner de hora -->
+  <div class="update-time-container" *ngIf="lastUpdateTime && !loading">
+    <div class="update-time-banner">
+      <span class="update-icon">🕐</span>
+      <span class="update-text">Última actualización: <strong>{{ lastUpdateTime }}</strong></span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando datos del Euribor...</p>
+  </div>
+
+  <!-- Content -->
+  <div class="content" *ngIf="!loading">
+    
+    <!-- Euribor Card -->
+    <div class="euribor-section">
+      <div class="euribor-card">
+        <div class="euribor-header">
+          <div class="euribor-icon">📊</div>
+          <div class="euribor-info">
+            <h2>Euribor a 1 año</h2>
+            <span class="euribor-date">{{ formatDate(euriborDate) }}</span>
+          </div>
+        </div>
+
+        <div class="euribor-value">
+          <span class="rate-number">{{ formatNumber(euriborRate, 3) }}%</span>
+          <div class="rate-change" [ngClass]="getChangeClass(euriborChange)">
+            <span class="change-icon">{{ getChangeIcon(euriborChange) }}</span>
+            <span class="change-value">{{ formatNumber(Math.abs(euriborChange), 3) }}%</span>
+            <span class="change-label">vs. día anterior</span>
+          </div>
+        </div>
+
+        <div class="euribor-description">
+          <p>
+            ℹ️ El Euribor es el tipo de interés de referencia para la mayoría de hipotecas 
+            variables en Europa. Se actualiza diariamente.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calculadora -->
+    <div class="calculator-section">
+      <div class="calculator-card">
+        <h2 class="section-title">🧮 Calculadora de Hipoteca</h2>
+
+        <div class="calculator-form">
+          
+          <!-- Capital pendiente -->
+          <div class="form-group">
+            <label for="capital">Capital Pendiente (€)</label>
+            <input 
+              id="capital"
+              type="number" 
+              [(ngModel)]="capitalPendiente"
+              (ngModelChange)="calcularCuota()"
+              placeholder="150000"
+              min="1"
+              step="1000"
+              class="form-input">
+            <small>Cantidad que aún debes de la hipoteca</small>
+          </div>
+
+          <!-- Fecha de finalización -->
+          <div class="form-group">
+            <label for="fecha">Fecha de Finalización</label>
+            <input 
+              id="fecha"
+              type="date" 
+              [(ngModel)]="fechaFinalizacion"
+              (ngModelChange)="calcularCuota()"
+              class="form-input">
+            <small>Fecha en la que terminas de pagar la hipoteca</small>
+          </div>
+
+          <!-- Diferencial -->
+          <div class="form-group">
+            <label for="diferencial">Diferencial (%)</label>
+            <input 
+              id="diferencial"
+              type="number" 
+              [(ngModel)]="diferencial"
+              (ngModelChange)="onDiferencialChange()"
+              placeholder="0.50"
+              min="0"
+              step="0.01"
+              class="form-input">
+            <small>El diferencial que aplica tu banco (ej: 0.50%)</small>
+          </div>
+
+          <!-- Tipo de interés resultante -->
+          <div class="info-box">
+            <div class="info-row">
+              <span class="info-label">Euribor actual:</span>
+              <span class="info-value">{{ formatNumber(euriborRate, 3) }}%</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">+ Diferencial:</span>
+              <span class="info-value">{{ formatNumber(diferencial, 2) }}%</span>
+            </div>
+            <div class="info-row total-rate">
+              <span class="info-label">= Tipo de Interés:</span>
+              <span class="info-value highlight">{{ formatNumber(tipoInteres, 3) }}%</span>
+            </div>
+          </div>
+
+          <!-- Resultados -->
+          <div class="results-section" *ngIf="cuotaMensual > 0">
+            <h3 class="results-title">📈 Resultados</h3>
+
+            <div class="result-card main-result">
+              <div class="result-icon">💰</div>
+              <div class="result-content">
+                <span class="result-label">Cuota Mensual</span>
+                <span class="result-value">{{ formatNumber(cuotaMensual, 2) }}€</span>
+              </div>
+            </div>
+
+            <div class="results-grid">
+              <div class="result-item">
+                <span class="result-label">Plazo restante:</span>
+                <span class="result-value">{{ plazoMeses }} meses ({{ formatNumber(plazoMeses / 12, 1) }} años)</span>
+              </div>
+
+              <div class="result-item">
+                <span class="result-label">Total a pagar:</span>
+                <span class="result-value">{{ formatNumber(totalAPagar, 2) }}€</span>
+              </div>
+
+              <div class="result-item">
+                <span class="result-label">Capital pendiente:</span>
+                <span class="result-value">{{ formatNumber(capitalPendiente || 0, 2) }}€</span>
+              </div>
+
+              <div class="result-item">
+                <span class="result-label">Intereses totales:</span>
+                <span class="result-value interest">{{ formatNumber(interesesTotales, 2) }}€</span>
+              </div>
+            </div>
+
+            <div class="disclaimer">
+              ℹ️ Cálculo realizado con sistema de amortización francés (cuota constante). 
+              Los resultados son aproximados y pueden variar según las condiciones de tu banco.
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div class="empty-calculator" *ngIf="cuotaMensual === 0">
+            <div class="empty-icon">📝</div>
+            <p>Introduce el capital pendiente y la fecha de finalización para calcular tu cuota</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Histórico -->
+    <div class="historico-section" *ngIf="historico.length > 0">
+      <h2 class="section-title">📅 Histórico Últimos 30 Días</h2>
+      
+      <div class="historico-list">
+        <div 
+          class="historico-item" 
+          *ngFor="let item of historico"
+          [ngClass]="getChangeClass(item.change)">
+          
+          <div class="historico-date">
+            {{ formatDate(item.date) }}
+          </div>
+          
+          <div class="historico-rate">
+            {{ formatNumber(item.rate, 3) }}%
+          </div>
+          
+          <div class="historico-change">
+            <span class="change-icon">{{ getChangeIcon(item.change) }}</span>
+            <span>{{ formatNumber(Math.abs(item.change), 3) }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
