@@ -228,8 +228,3 @@ Creado para gestión de inversiones en bolsa del mercado español.
 ---
 
 **¡Feliz inversión! 📈💰**
-# burtsa
-# angular-burtsa-euribor
-# burtsa-frontend
-# burtsa-frontend
-# burtsa-frontend
