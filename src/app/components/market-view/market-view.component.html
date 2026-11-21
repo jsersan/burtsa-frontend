@@ -25,6 +25,14 @@
     </div>
   </header>
 
+  <!-- Banner de hora de actualización - FUERA del header -->
+  <div class="update-time-container" *ngIf="lastUpdateTime && !loading">
+    <div class="update-time-banner">
+      <span class="update-icon">🕐</span>
+      <span class="update-text">Última actualización: <strong>{{ lastUpdateTime }}</strong></span>
+    </div>
+  </div>
+
   <!-- Index Summary (solo para IBEX35) -->
   <div class="index-summary" *ngIf="marketType === 'ibex35' && indexData">
     <div class="index-card">
@@ -44,7 +52,7 @@
     </div>
   </div>
 
-  <!-- Top Movers (para IBEX35 y Mercado Continuo) -->
+  <!-- Top Movers -->
   <div class="movers-section">
     <div class="movers-card">
       <h3 class="movers-title">Mejores</h3>
@@ -106,7 +114,7 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Fila del índice IBEX-35 (solo para IBEX35) -->
+        <!-- Fila del índice IBEX-35 -->
         <tr *ngIf="marketType === 'ibex35' && indexData" class="index-row">
           <td class="stock-name index-name">IBEX-35</td>
           <td class="text-right">{{ formatNumber(indexData.value, 0) }}</td>
@@ -123,7 +131,7 @@
           <td class="text-right">CIERRE</td>
         </tr>
 
-        <!-- Filas de acciones - AHORA CLICABLES -->
+        <!-- Filas de acciones -->
         <tr *ngFor="let stock of stocks" class="stock-row">
           <td class="stock-name" (click)="navigateToStock(stock.name)">
             {{ stock.name }}

@@ -189,6 +189,12 @@
       </div>
     </div>
 
+    <!-- Evolución del valor y análisis técnico -->
+    <div class="analysis-section" style="display: flex; flex-direction: column; gap: 24px; margin: 24px 0;">
+      <app-stock-evolution [symbol]="yahooSymbol" [title]="stock.name" />
+      <app-technical-analysis [symbol]="yahooSymbol" />
+    </div>
+
     <!-- Company Profile -->
     <div class="company-section">
       <button class="company-button" (click)="goToCompanyWebsite()">

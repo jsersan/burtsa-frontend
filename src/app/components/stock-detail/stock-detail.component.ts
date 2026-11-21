@@ -5,13 +5,16 @@ import { FormsModule } from '@angular/forms'
 import { MarketDataService, StockData } from '../../services/market-data.service'
 import { AuthService } from '../../services/auth.service'
 import { PortfolioService } from '../../services/portfolio.service'
+import { YahooFinanceService } from '../../services/yahoo-finance.service'
+import { StockEvolutionComponent } from '../stock-anaysis/stock-evolution.component'
+import { TechnicalAnalysisComponent } from '../stock-anaysis/technical-analysis.component'
 import { Subject, takeUntil } from 'rxjs'
 import Swal from 'sweetalert2'
 
 @Component({
   selector: 'app-stock-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, StockEvolutionComponent, TechnicalAnalysisComponent],
   templateUrl: './stock-detail.component.html',
   styleUrls: ['./stock-detail.component.scss']
 })
@@ -74,8 +77,14 @@ export class StockDetailComponent implements OnInit, OnDestroy {
     private router: Router,
     private marketDataService: MarketDataService,
     private authService: AuthService,
-    private portfolioService: PortfolioService
+    private portfolioService: PortfolioService,
+    private yahooFinance: YahooFinanceService
   ) {}
+
+  // Símbolo de Yahoo (p. ej. 'ACX.MC') a partir del nombre del valor de la ruta
+  get yahooSymbol (): string {
+    return this.yahooFinance.getTicker(this.stockSymbol)
+  }
 
   ngOnInit () {
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {

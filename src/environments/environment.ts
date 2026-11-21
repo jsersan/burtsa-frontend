@@ -2,13 +2,21 @@
 // NO SUBAS ESTE ARCHIVO A REPOSITORIOS PÚBLICOS (ya está en .gitignore)
 
 export const environment = {
-    yahooFinance: {
-        enabled: true  // ← SIN API KEY
-      },
-    finnhub: {
-      key: 'd6lsshpr01quej91bu9gd6lsshpr01quej91bua0',  // ← Pega tu key
-      enabled: false
-    },
-    useMockData: false,  // ← Cambiar a false
-    activeAPI: 'yahooFinance'  
+  production: false,
+  
+  // Yahoo Finance (sin API key necesaria)
+  yahooFinance: {
+    enabled: true,
+    backendUrl: 'http://localhost:3000/api'  // ← Desarrollo
+  },
+  
+  // Finnhub (alternativa - requiere API key)
+  finnhub: {
+    key: '',  // Opcional: pega tu Finnhub API key aquí
+    enabled: false
+  },
+  
+  // Control de datos
+  useMockData: false,  // ← IMPORTANTE: Mantén esto en true inicialmente
+  activeAPI: 'yahooFinance'
 };

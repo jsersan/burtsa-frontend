@@ -1,185 +1,192 @@
 <div class="portfolio-container">
-    <!-- Header -->
-    <header class="portfolio-header">
-      <div class="header-content">
-        <div class="user-info">
-          <h1 class="logo">Burtsa</h1>
-          <span class="user-name">👤 {{ userName }}</span>
-        </div>
-        <div class="header-actions">
-          <button class="action-button" (click)="goToMarket()">
-            📊 Ver Mercado
-          </button>
-          <button class="action-button logout-button" (click)="logout()">
-            🚪 Cerrar Sesión
-          </button>
-        </div>
+  <!-- Header -->
+  <header class="portfolio-header">
+    <div class="header-content">
+      <div class="user-info">
+        <h1 class="logo">Burtsa</h1>
+        <span class="user-name">👤 {{ userName }}</span>
       </div>
-    </header>
-  
-    <!-- Loading -->
-    <div class="loading-container" *ngIf="loading">
-      <div class="spinner"></div>
-      <p>Cargando tu cartera...</p>
+      <div class="header-actions">
+        <button class="action-button" (click)="goToMarket()">
+          📊 Ver Mercado
+        </button>
+        <button class="action-button logout-button" (click)="logout()">
+          🚪 Cerrar Sesión
+        </button>
+      </div>
     </div>
-  
-    <!-- Portfolio Content -->
-    <div class="portfolio-content" *ngIf="!loading && portfolio">
+  </header>
+
+  <!-- Banner de hora - FUERA del header verde -->
+  <div class="update-time-container" *ngIf="lastUpdateTime && !loading">
+    <div class="update-time-banner">
+      <span class="update-icon">🕐</span>
+      <span class="update-text">Última actualización: <strong>{{ lastUpdateTime }}</strong></span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando tu cartera...</p>
+  </div>
+
+  <!-- Portfolio Content -->
+  <div class="portfolio-content" *ngIf="!loading && portfolio">
+    
+    <!-- Summary Cards -->
+    <div class="summary-section">
+      <div class="summary-card cash-card">
+        <div class="card-icon">💰</div>
+        <div class="card-content">
+          <span class="card-label">Efectivo Disponible</span>
+          <span class="card-value">{{ formatNumber(portfolio.cash, 2) }}€</span>
+          <button class="manage-cash-button" (click)="manageCash()">
+            Gestionar Efectivo
+          </button>
+        </div>
+      </div>
+
+      <div class="summary-card total-invested">
+        <div class="card-icon">💼</div>
+        <div class="card-content">
+          <span class="card-label">Total Invertido</span>
+          <span class="card-value">{{ formatNumber(portfolio.totalInvested, 2) }}€</span>
+        </div>
+      </div>
+
+      <div class="summary-card current-value">
+        <div class="card-icon">📈</div>
+        <div class="card-content">
+          <span class="card-label">Valor Actual</span>
+          <span class="card-value">{{ formatNumber(portfolio.currentValue, 2) }}€</span>
+        </div>
+      </div>
+
+      <div class="summary-card profit-loss" [ngClass]="getChangeClass(portfolio.totalProfitLoss)">
+        <div class="card-icon">{{ portfolio.totalProfitLoss >= 0 ? '📊' : '📉' }}</div>
+        <div class="card-content">
+          <span class="card-label">Ganancia/Pérdida</span>
+          <span class="card-value">
+            {{ portfolio.totalProfitLoss >= 0 ? '+' : '' }}{{ formatNumber(portfolio.totalProfitLoss, 2) }}€
+            <span class="percentage">({{ formatNumber(portfolio.totalProfitLossPercent, 2) }}%)</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="getStocksArray().length === 0">
+      <div class="empty-icon">📊</div>
+      <h2>Tu cartera está vacía</h2>
+      <p *ngIf="portfolio.cash === 0">
+        💡 Primero ingresa fondos y luego comienza a invertir explorando el mercado.
+      </p>
+      <p *ngIf="portfolio.cash > 0">
+        Tienes {{ formatNumber(portfolio.cash, 2) }}€ disponibles para invertir.
+      </p>
+      <div class="empty-actions">
+        <button class="primary-button" (click)="manageCash()" *ngIf="portfolio.cash === 0">
+          💰 Ingresar Fondos
+        </button>
+        <button class="primary-button" (click)="goToMarket()">
+          📊 Ver Mercado
+        </button>
+      </div>
+    </div>
+
+    <!-- Stocks List -->
+    <div class="stocks-section" *ngIf="getStocksArray().length > 0">
+      <h2 class="section-title">Mis Acciones</h2>
       
-      <!-- Summary Cards -->
-      <div class="summary-section">
-        <!-- Tarjeta de Efectivo -->
-        <div class="summary-card cash-card">
-          <div class="card-icon">💰</div>
-          <div class="card-content">
-            <span class="card-label">Efectivo Disponible</span>
-            <span class="card-value">{{ formatNumber(portfolio.cash, 2) }}€</span>
-            <button class="manage-cash-button" (click)="manageCash()">
-              Gestionar Efectivo
-            </button>
-          </div>
-        </div>
-  
-        <div class="summary-card total-invested">
-          <div class="card-icon">💼</div>
-          <div class="card-content">
-            <span class="card-label">Total Invertido</span>
-            <span class="card-value">{{ formatNumber(portfolio.totalInvested, 2) }}€</span>
-          </div>
-        </div>
-  
-        <div class="summary-card current-value">
-          <div class="card-icon">📈</div>
-          <div class="card-content">
-            <span class="card-label">Valor Actual</span>
-            <span class="card-value">{{ formatNumber(portfolio.currentValue, 2) }}€</span>
-          </div>
-        </div>
-  
-        <div class="summary-card profit-loss" [ngClass]="getChangeClass(portfolio.totalProfitLoss)">
-          <div class="card-icon">{{ portfolio.totalProfitLoss >= 0 ? '📊' : '📉' }}</div>
-          <div class="card-content">
-            <span class="card-label">Ganancia/Pérdida</span>
-            <span class="card-value">
-              {{ portfolio.totalProfitLoss >= 0 ? '+' : '' }}{{ formatNumber(portfolio.totalProfitLoss, 2) }}€
-              <span class="percentage">({{ formatNumber(portfolio.totalProfitLossPercent, 2) }}%)</span>
-            </span>
-          </div>
-        </div>
-      </div>
-  
-      <!-- Empty State -->
-      <div class="empty-state" *ngIf="getStocksArray().length === 0">
-        <div class="empty-icon">📊</div>
-        <h2>Tu cartera está vacía</h2>
-        <p *ngIf="portfolio.cash === 0">
-          💡 Primero ingresa fondos y luego comienza a invertir explorando el mercado.
-        </p>
-        <p *ngIf="portfolio.cash > 0">
-          Tienes {{ formatNumber(portfolio.cash, 2) }}€ disponibles para invertir.
-        </p>
-        <div class="empty-actions">
-          <button class="primary-button" (click)="manageCash()" *ngIf="portfolio.cash === 0">
-            💰 Ingresar Fondos
-          </button>
-          <button class="primary-button" (click)="goToMarket()">
-            📊 Ver Mercado
-          </button>
-        </div>
-      </div>
-  
-      <!-- Stocks List -->
-      <div class="stocks-section" *ngIf="getStocksArray().length > 0">
-        <h2 class="section-title">Mis Acciones</h2>
-        
-        <div class="stocks-grid">
-          <div 
-            class="stock-card" 
-            *ngFor="let stock of getStocksArray()"
-            (click)="goToStock(stock.symbol)">
-            
-            <div class="stock-header">
-              <div class="stock-name">
-                <h3>{{ stock.name }}</h3>
-                <span class="stock-symbol">{{ stock.symbol }}</span>
-              </div>
-              <div class="stock-quantity">
-                {{ stock.quantity }} acciones
-              </div>
+      <div class="stocks-grid">
+        <div 
+          class="stock-card" 
+          *ngFor="let stock of getStocksArray()"
+          (click)="goToStock(stock.symbol)">
+          
+          <div class="stock-header">
+            <div class="stock-name">
+              <h3>{{ stock.name }}</h3>
+              <span class="stock-symbol">{{ stock.symbol }}</span>
             </div>
-  
-            <div class="stock-prices">
-              <div class="price-row">
-                <span class="price-label">Precio Medio:</span>
-                <span class="price-value">{{ formatNumber(stock.avgPrice, 4) }}€</span>
-              </div>
-              <div class="price-row" *ngIf="stock.currentPrice">
-                <span class="price-label">Precio Actual:</span>
-                <span class="price-value">{{ formatNumber(stock.currentPrice, 4) }}€</span>
-              </div>
+            <div class="stock-quantity">
+              {{ stock.quantity }} acciones
             </div>
-  
-            <div class="stock-values">
-              <div class="value-item">
-                <span class="value-label">Invertido:</span>
-                <span class="value-amount">{{ formatNumber(stock.totalInvested, 2) }}€</span>
-              </div>
-              <div class="value-item" *ngIf="stock.currentValue">
-                <span class="value-label">Valor Actual:</span>
-                <span class="value-amount">{{ formatNumber(stock.currentValue, 2) }}€</span>
-              </div>
+          </div>
+
+          <div class="stock-prices">
+            <div class="price-row">
+              <span class="price-label">Precio Medio:</span>
+              <span class="price-value">{{ formatNumber(stock.avgPrice, 4) }}€</span>
             </div>
-  
-            <div class="stock-profit" *ngIf="stock.profitLoss !== undefined">
-              <div class="profit-badge" [ngClass]="getChangeClass(stock.profitLoss)">
-                <span class="profit-value">
-                  {{ stock.profitLoss >= 0 ? '+' : '' }}{{ formatNumber(stock.profitLoss, 2) }}€
-                </span>
-                <span class="profit-percent">
-                  ({{ stock.profitLoss >= 0 ? '+' : '' }}{{ formatNumber(stock.profitLossPercent || 0, 2) }}%)
-                </span>
-              </div>
+            <div class="price-row" *ngIf="stock.currentPrice">
+              <span class="price-label">Precio Actual:</span>
+              <span class="price-value">{{ formatNumber(stock.currentPrice, 4) }}€</span>
+            </div>
+          </div>
+
+          <div class="stock-values">
+            <div class="value-item">
+              <span class="value-label">Invertido:</span>
+              <span class="value-amount">{{ formatNumber(stock.totalInvested, 2) }}€</span>
+            </div>
+            <div class="value-item" *ngIf="stock.currentValue">
+              <span class="value-label">Valor Actual:</span>
+              <span class="value-amount">{{ formatNumber(stock.currentValue, 2) }}€</span>
+            </div>
+          </div>
+
+          <div class="stock-profit" *ngIf="stock.profitLoss !== undefined">
+            <div class="profit-badge" [ngClass]="getChangeClass(stock.profitLoss)">
+              <span class="profit-value">
+                {{ stock.profitLoss >= 0 ? '+' : '' }}{{ formatNumber(stock.profitLoss, 2) }}€
+              </span>
+              <span class="profit-percent">
+                ({{ stock.profitLoss >= 0 ? '+' : '' }}{{ formatNumber(stock.profitLossPercent || 0, 2) }}%)
+              </span>
             </div>
           </div>
         </div>
       </div>
-  
-      <!-- Transactions History -->
-      <div class="transactions-section" *ngIf="transactions.length > 0">
-        <h2 class="section-title">Historial de Operaciones</h2>
-        
-        <div class="transactions-list">
-          <div 
-            class="transaction-item"
-            [ngClass]="getTransactionClass(transaction.type)"
-            *ngFor="let transaction of transactions">
-            
-            <div class="transaction-icon">
-              {{ getTransactionIcon(transaction.type) }}
+    </div>
+
+    <!-- Transactions History -->
+    <div class="transactions-section" *ngIf="transactions.length > 0">
+      <h2 class="section-title">Historial de Operaciones</h2>
+      
+      <div class="transactions-list">
+        <div 
+          class="transaction-item"
+          [ngClass]="getTransactionClass(transaction.type)"
+          *ngFor="let transaction of transactions">
+          
+          <div class="transaction-icon">
+            {{ getTransactionIcon(transaction.type) }}
+          </div>
+
+          <div class="transaction-info">
+            <div class="transaction-header">
+              <span class="transaction-type">
+                {{ transaction.type === 'buy' ? 'COMPRA' : 'VENTA' }}
+              </span>
+              <span class="transaction-name">{{ transaction.name }}</span>
             </div>
-  
-            <div class="transaction-info">
-              <div class="transaction-header">
-                <span class="transaction-type">
-                  {{ transaction.type === 'buy' ? 'COMPRA' : 'VENTA' }}
-                </span>
-                <span class="transaction-name">{{ transaction.name }}</span>
-              </div>
-              <div class="transaction-details">
-                <span>{{ transaction.quantity }} acciones</span>
-                <span>·</span>
-                <span>{{ formatNumber(transaction.price, 4) }}€</span>
-              </div>
-              <div class="transaction-date">
-                {{ formatDate(transaction.timestamp) }}
-              </div>
+            <div class="transaction-details">
+              <span>{{ transaction.quantity }} acciones</span>
+              <span>·</span>
+              <span>{{ formatNumber(transaction.price, 4) }}€</span>
             </div>
-  
-            <div class="transaction-total">
-              {{ formatNumber(transaction.total, 2) }}€
+            <div class="transaction-date">
+              {{ formatDate(transaction.timestamp) }}
             </div>
+          </div>
+
+          <div class="transaction-total">
+            {{ formatNumber(transaction.total, 2) }}€
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>

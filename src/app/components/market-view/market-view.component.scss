@@ -75,6 +75,37 @@
   }
 }
 
+// Contenedor externo del banner
+.update-time-container {
+  background-color: #f8f9fa;
+  padding: 0 20px;
+}
+
+// Banner de hora - color verde del contenedor
+.update-time-banner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #2c7a7b;
+  
+  .update-icon {
+    font-size: 14px;
+  }
+  
+  .update-text {
+    font-weight: 500;
+    
+    strong {
+      font-weight: 700;
+      font-size: 14px;
+    }
+  }
+}
+
 // Index Summary
 .index-summary {
   max-width: 1400px;
@@ -162,21 +193,20 @@
   font-weight: 600;
 }
 
-// Movers Section - CONTENEDOR EXTERNO
+// Movers Section
 .movers-section {
-  max-width: 1400px;     // ← Mismo que table-container
-  margin: 20px auto;     // ← Mismo que table-container
-  padding: 0 20px;       // ← Padding EXTERNO (no afecta a las tarjetas internas)
+  max-width: 1400px;
+  margin: 20px auto;
+  padding: 0 20px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
 
-// Movers Cards - TARJETAS INTERNAS
 .movers-card {
   background-color: white;
   border-radius: 8px;
-  padding: 20px;         // ← Padding INTERNO de cada tarjeta
+  padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -231,12 +261,12 @@
   }
 }
 
-// Table Container - EXACTAMENTE IGUAL QUE MOVERS-SECTION
+// Table Container
 .table-container {
-  max-width: 1400px;     // ← IGUAL que movers-section
-  margin: 20px auto;     // ← IGUAL que movers-section
-  padding: 0 20px;       // ← IGUAL que movers-section (padding externo)
-  background-color: transparent;  // ← Sin fondo para el contenedor externo
+  max-width: 1400px;
+  margin: 20px auto;
+  padding: 0 20px;
+  background-color: transparent;
   position: relative;
   overflow-x: auto;
 }
@@ -269,7 +299,7 @@
   100% { transform: rotate(360deg); }
 }
 
-// Tabla - CON FONDO BLANCO Y BORDES VISIBLES
+// Tabla
 .stocks-table {
   width: 100%;
   border-collapse: separate;
@@ -314,39 +344,29 @@
     }
   }
 
-  // Estilos para headers ordenables
-th.sortable {
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.2s ease;
-  position: relative;
-  
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-  }
-  
-  &.sorted {
-    background-color: rgba(44, 122, 123, 0.1);
-    font-weight: 700;
-  }
-  
-  .sort-icon {
-    display: inline-block;
-    margin-left: 4px;
-    font-size: 10px;
-    color: #2c7a7b;
-    min-width: 10px;
-  }
-}
-
-// Responsive: ocultar iconos en móvil
-@media (max-width: 768px) {
   th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+    position: relative;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    &.sorted {
+      background-color: rgba(44, 122, 123, 0.1);
+      font-weight: 700;
+    }
+    
     .sort-icon {
-      display: none;
+      display: inline-block;
+      margin-left: 4px;
+      font-size: 10px;
+      color: #2c7a7b;
+      min-width: 10px;
     }
   }
-}
 
   tbody tr {
     border-bottom: 1px solid #e5e7eb;
@@ -447,6 +467,12 @@ th.sortable {
   .nav-button {
     flex: 1;
     min-width: 120px;
+  }
+
+  th.sortable {
+    .sort-icon {
+      display: none;
+    }
   }
 
   .movers-section {

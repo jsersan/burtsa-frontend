@@ -19,6 +19,7 @@ export class PortfolioComponent implements OnInit, OnDestroy {
   transactions: Transaction[] = [];
   loading = true;
   userName = '';
+  lastUpdateTime: string = '';
   
   private destroy$ = new Subject<void>();
   Math = Math;
@@ -67,6 +68,9 @@ export class PortfolioComponent implements OnInit, OnDestroy {
       if (this.portfolio) {
         await this.updatePrices(userId);
       }
+      
+      // Actualizar hora de última actualización
+      this.updateLastUpdateTime();
     } catch (error) {
       console.error('Error al cargar datos:', error);
       
@@ -111,10 +115,23 @@ export class PortfolioComponent implements OnInit, OnDestroy {
       setTimeout(async () => {
         await this.portfolioService.updatePortfolioPrices(userId, currentPrices);
         this.portfolio = await this.portfolioService.getPortfolio(userId);
+        this.updateLastUpdateTime();
       }, 1000);
     } catch (error) {
       console.error('Error al actualizar precios:', error);
     }
+  }
+
+  /**
+   * Actualizar hora de última actualización
+   */
+  private updateLastUpdateTime() {
+    const now = new Date();
+    this.lastUpdateTime = now.toLocaleTimeString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
   }
 
   /**

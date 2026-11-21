@@ -19,6 +19,7 @@ export class MarketViewComponent implements OnInit, OnDestroy {
   topGainers: StockData[] = [];
   topLosers: StockData[] = [];
   loading = true;
+  lastUpdateTime: string = '';
   private destroy$ = new Subject<void>();
   
   // Variables de ordenamiento
@@ -59,6 +60,7 @@ export class MarketViewComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe(data => {
           this.indexData = data;
+          this.updateLastUpdateTime();
         });
 
       this.marketDataService.getIBEX35Stocks()
@@ -68,6 +70,7 @@ export class MarketViewComponent implements OnInit, OnDestroy {
           this.stocks = stocks.sort((a, b) => a.name.localeCompare(b.name));
           this.calculateTopMovers();
           this.loading = false;
+          this.updateLastUpdateTime();
           
           // Aplicar ordenamiento si había uno activo
           if (this.sortColumn) {
@@ -82,6 +85,7 @@ export class MarketViewComponent implements OnInit, OnDestroy {
           this.stocks = stocks.sort((a, b) => a.name.localeCompare(b.name));
           this.calculateTopMovers();
           this.loading = false;
+          this.updateLastUpdateTime();
           
           // Aplicar ordenamiento si había uno activo
           if (this.sortColumn) {
@@ -89,6 +93,18 @@ export class MarketViewComponent implements OnInit, OnDestroy {
           }
         });
     }
+  }
+
+  /**
+   * Actualizar hora de última actualización
+   */
+  private updateLastUpdateTime() {
+    const now = new Date();
+    this.lastUpdateTime = now.toLocaleTimeString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
   }
 
   calculateTopMovers() {
