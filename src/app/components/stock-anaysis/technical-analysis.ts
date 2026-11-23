@@ -509,7 +509,8 @@ export function analyze(candles: Candle[]): TechnicalAnalysis | null {
   else if (score >= 0.15) { level = 'buy'; label = 'COMPRA'; }
   else if (score <= -0.4) { level = 'sell'; label = 'VENTA FUERTE'; }
   else if (score <= -0.15) { level = 'sell'; label = 'VENTA'; }
-  if (level !== 'neutral') description = `${nBuy} señales de compra frente a ${nSell} de venta`;
+  const pl = (n: number) => (n === 1 ? 'señal' : 'señales');
+  if (level !== 'neutral') description = `${nBuy} ${pl(nBuy)} de compra frente a ${nSell} de venta`;
   const recommendation = { level, label, description, gauge: Math.round(50 + score * 50) };
 
   // ---------------------------- Tendencia ---------------------------------
