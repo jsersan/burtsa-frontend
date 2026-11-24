@@ -111,6 +111,7 @@
           <th class="text-right sortable" (click)="sortBy('time')" [class.sorted]="isSortedBy('time')">
             Hora <span class="sort-icon">{{ getSortIcon('time') }}</span>
           </th>
+          <th class="text-right col-rec">Recomendación</th>
         </tr>
       </thead>
       <tbody>
@@ -129,6 +130,7 @@
           <td class="text-right">{{ formatNumber(indexData.value * 1.003, 0) }}</td>
           <td class="text-right">{{ formatNumber(indexData.value * 0.997, 0) }}</td>
           <td class="text-right">CIERRE</td>
+<td class="text-right col-rec"></td>
         </tr>
 
         <!-- Filas de acciones -->
@@ -148,6 +150,7 @@
           <td class="text-right">{{ formatNumber(stock.dayHigh, 0) }}</td>
           <td class="text-right">{{ formatNumber(stock.dayLow, 0) }}</td>
           <td class="text-right">{{ stock.time }}</td>
+<td class="text-right col-rec" style="text-align:center"><app-recommendation-badge [name]="stock.name" /></td>
         </tr>
       </tbody>
     </table>
