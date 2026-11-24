@@ -3,12 +3,14 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MarketDataService, StockData, IndexData } from '../../services/market-data.service';
 import { Subject, takeUntil } from 'rxjs';
+
 import Swal from 'sweetalert2';
+import { RecommendationBadgeComponent } from '../recommendation-badge/recommendation-badge.component';
 
 @Component({
   selector: 'app-market-view',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RecommendationBadgeComponent],
   templateUrl: './market-view.component.html',
   styleUrls: ['./market-view.component.scss']
 })
